@@ -1,1 +1,1 @@
-# QASystem_AWSBedRock_Langchain
+# RAG_System_AWSBedRock_ECR_Langchain
