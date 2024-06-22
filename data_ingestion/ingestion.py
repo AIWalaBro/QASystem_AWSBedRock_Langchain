@@ -18,16 +18,16 @@ def data_ingestion():
     documents = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size =1000, chunk_overlap = 1000)
     docs = text_splitter.split_documents(documents)
-    print('your document chunk succesfully created!')
+    # print('your document chunk succesfully created!')
     return docs
     
 
 def get_vector_store(docs):
-    print('faiss indexing local vector store creation started...')
+    # print('faiss indexing local vector store creation started...')
     vector_store_faiss = FAISS.from_documents(docs, bedrock_embeddings)
     vector_store_faiss.save_local("faiss_index")
-    print('faiss indexing local vector store succesfully created!')
-    # return vector_store_faiss
+    # print('faiss indexing local vector store succesfully created!')
+    return vector_store_faiss
     
 if __name__ == '__main__':
     docs = data_ingestion()
@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
 
 
-#-----------------------------------------for debugging -----------------------------------
+#------------------------------------------------------- for debugging ----------------------------------------------------------------------
 
 '''
 you can use the following functions to create a data ingestion and vecetore store creation,
