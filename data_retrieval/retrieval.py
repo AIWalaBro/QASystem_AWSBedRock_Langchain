@@ -4,8 +4,8 @@ from langchain_community.llms import Bedrock
 from langchain_aws import BedrockLLM
 from langchain.prompts import PromptTemplate
 import boto3
-from data_ingestion.ingestion import get_vector_store
-from data_ingestion.ingestion import data_ingestion
+from data_ingestion.ingestion import get_vector_store, data_ingestion
+
 # connect to client server
 bedrock = boto3.client(service_name = 'bedrock-runtime')
 
@@ -14,8 +14,8 @@ bedrock = boto3.client(service_name = 'bedrock-runtime')
 prompt_template = """
 
 Human: Use the following pieces of context to provide a 
-concise answer to the question at the end but usse atleast summarize with 
-250 words with detailed explaantions. If you don't know the answer, 
+concise answer to the question at the end but use atleast summarize with 
+250 words with detailed explanations. If you don't know the answer, 
 just say that you don't know, don't try to make up an answer.
 <context>
 {context}
@@ -32,9 +32,10 @@ PROMPT = PromptTemplate(
 # lets import the llms module
 def get_llama2_llm():
     llm = Bedrock(model_id = "meta.llama2-13b-chat-v1", client = bedrock, model_kwargs = {'max_tokens':512})
+    return llm
 
 # retrieval fucntions
-def get_data_retrieval(llm, vectorstore_faiss, query):
+def get_response_llm(llm, vectorstore_faiss, query):
     qa = RetrievalQA.from_chain_type(
         llm = llm,
         chain_type = "stuff",
@@ -54,7 +55,7 @@ if __name__ == "__main__":
     vectorstore_faiss = get_vector_store(docs)
     query = "when the india is born"
     llm = get_llama2_llm()
-    get_data_retrieval(llm,vectorstore_faiss,query)
+    get_response_llm(llm,vectorstore_faiss,query)
     
     # faiss_index=FAISS.load_local("faiss_index",bedrock_embeddings,allow_dangerous_deserialization=True)
     # query="What is RAG token?"

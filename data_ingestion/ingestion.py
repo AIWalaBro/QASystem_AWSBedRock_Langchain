@@ -15,59 +15,34 @@ bedrock_embeddings = BedrockEmbeddings(model_id="amazon.titan-embed-text-v1", cl
 
 def data_ingestion():
     loader = PyPDFDirectoryLoader("D:\\GenerativeAI_Project_4\\aws\\QA_System_With_AWSBedrock_and_Langchain\\RAG_System_AWSBedRock_ECR_DockerLangchain\\data")
+    # loader = PyPDFDirectoryLoader("./data")
     documents = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size =1000, chunk_overlap = 1000)
     docs = text_splitter.split_documents(documents)
     # print('your document chunk succesfully created!')
     return docs
     
-
 def get_vector_store(docs):
-    # print('faiss indexing local vector store creation started...')
-    vector_store_faiss = FAISS.from_documents(docs, bedrock_embeddings)
-    vector_store_faiss.save_local("faiss_index")
-    # print('faiss indexing local vector store succesfully created!')
-    return vector_store_faiss
-    
+    if not docs:
+        print("No documents found after splitting.")
+        return
+    print(f"Number of documents to embed: {len(docs)}")
+
+    # Create a 'vector_store' directory at the root level of the project
+    project_root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    vector_store_dir = os.path.join(project_root_dir, 'vector_store')
+    if not os.path.exists(vector_store_dir):
+        os.makedirs(vector_store_dir)
+
+    # Save the FAISS index in the 'vector_store' directory
+    vector_store_path = os.path.join(vector_store_dir, 'faiss_index')
+    try:
+        vector_store_faiss = FAISS.from_documents(docs, bedrock_embeddings)
+        vector_store_faiss.save_local(vector_store_path)
+        print(f"FAISS index saved at: {vector_store_path}")
+    except Exception as e:
+        print(f"Error while creating FAISS vector store: {e}")
+
 if __name__ == '__main__':
     docs = data_ingestion()
     get_vector_store(docs)
-
-
-
-#------------------------------------------------------- for debugging ----------------------------------------------------------------------
-
-'''
-you can use the following functions to create a data ingestion and vecetore store creation,
-it just an debugging function where you can each steps where you code getting error or runnin
-sucessfully.
-'''
-
-# def data_ingestion():
-#     loader = PyPDFDirectoryLoader("D:\\GenerativeAI_Project_4\\aws\\QA_System_With_AWSBedrock_and_Langchain\\RAG_System_AWSBedRock_ECR_DockerLangchain\\data")
-#     documents = loader.load()
-#     if not documents:
-#         print("No documents loaded from the directory.")
-#         return []
-#     print(f"Number of documents loaded: {len(documents)}")
-#     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=1000)
-#     docs = text_splitter.split_documents(documents)
-#     if not docs:
-#         print("No documents found after splitting.")
-#     else:
-#         print(f"Number of documents after splitting: {len(docs)}")
-#         print(f"Sample document: {docs[0]}")
-#     return docs
-
-
-# def get_vector_store(docs):
-#     if not docs:
-#         print("No documents found after splitting.")
-#         return
-#     print(f"Number of documents to embed: {len(docs)}")
-#     try:
-#         vector_store_faiss = FAISS.from_documents(docs, bedrock_embeddings)
-#         vector_store_faiss.save_local("faiss_index")
-#     except Exception as e:
-#         print(f"Error while creating FAISS vector store: {e}")
-
