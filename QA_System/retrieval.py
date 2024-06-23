@@ -56,7 +56,7 @@ if __name__=='__main__':
     #docs=data_ingestion()
     #vectorstore_faiss=get_vector_store(docs)
     faiss_index=FAISS.load_local("faiss_index",bedrock_embeddings,allow_dangerous_deserialization=True)
-    query="can you tell me the bullet points about this resume?"
+    query="give me the summarization of this resume within 5 lines"
     llm=get_llama2_llm()
     print(get_response_llm(llm,faiss_index,query))
     
